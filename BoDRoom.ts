@@ -62,7 +62,6 @@ export class BoDRoom extends Room<BoDState> {
         let state = this.state.state[ this.roomId ];
         let player = this.state.players[ client.id ];
         let postion = this.state.positions[ client.id ];
-        // console.log(data);
         if (data.type == 'move') {
             this.state.movePlayer(client, data.transform);
             console.log(data.transform);
@@ -72,6 +71,7 @@ export class BoDRoom extends Room<BoDState> {
     // When a client leaves the room
     onLeave (client: Client, consented: boolean) {
         this.state.removePlayer(client);
+        this.disconnect();
     }
 
     // Cleanup callback, called after there are no more clients in the room. (see `autoDispose`)

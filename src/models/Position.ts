@@ -18,7 +18,7 @@ export class Position {
         },
         public head: { 
             position: { x: number, y: number, z: number }, 
-            rotation: { x: number, y: number, z: number, w: number }
+            rotation: { x: number, y: number, z: number }
         } = 
         {
             position: {
@@ -29,14 +29,13 @@ export class Position {
             rotation: {
                 x: 0, 
                 y: 0, 
-                z: 0,
-                w: 0
+                z: 0
             } 
         },
         public rightHand: { 
             item: number,
             position: { x: number, y: number, z: number }, 
-            rotation: { x: number, y: number, z: number, w: number }
+            rotation: { x: number, y: number, z: number }
         } = 
         {
             item: null,
@@ -48,14 +47,13 @@ export class Position {
             rotation: {
                 x: 0, 
                 y: 0, 
-                z: 0,
-                w: 0
+                z: 0
             } 
         },
         public leftHand: { 
             item: number,
             position: { x: number, y: number, z: number }, 
-            rotation: { x: number, y: number, z: number, w: number }
+            rotation: { x: number, y: number, z: number }
         } = 
         {
             item: null,
@@ -67,8 +65,7 @@ export class Position {
             rotation: {
                 x: 0, 
                 y: 0, 
-                z: 0,
-                w: 0
+                z: 0
             } 
         }
     )

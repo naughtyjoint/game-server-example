@@ -2,16 +2,19 @@ import { EntityMap } from "colyseus";
 import { Player } from "./src/models/Player";
 import { State } from "./src/models/State";
 import { Position } from "./src/models/Position";
+import { WallPaper } from "./src/models/WallPaper";
 
 export class BoDState {
 
     constructor(public roomId: string){
         this.state[ this.roomId ] = new State();
+        this.wallPaper[ this.roomId ] = new WallPaper();
     };
 
     state: EntityMap<State> = {};
     players: EntityMap<Player> = {};
     positions: EntityMap<Position> = {};
+    wallPaper: EntityMap<WallPaper> = {};
     
     
     gameStateChange (state: number) {
@@ -22,31 +25,22 @@ export class BoDState {
         if (this.state[ this.roomId ].clientNum == 0) {
             this.players[ client.id ] = new Player('O');
             this.positions[ client.id ] = new Position(
-                { 
-                    position: { x: 4, y: 0, z: 4 }, 
-                    rotation: { x: 0, y: 250, z: 0 }
+                {
+                    position: { x: -53, y: 2, z: -30 }, 
+                    rotation: { x: 0, y: 45, z: 0 }
                 } 
             );
+            this.mapInit();
         } else {
             let playersNow: Player;
             for (let x in this.players) {
                 playersNow = this.players[x];
             }
-            if (playersNow.role === 'X') {
-                this.players[ client.id ] = new Player('O');
-                this.positions[ client.id ] = new Position(
-                    { 
-                        position: { x: -4, y: 0, z: -4 }, 
-                        rotation: { x: 0, y: 42, z: 0 }
-                    }
-                );
-            } else {
-                this.players[ client.id ] = new Player('X');
-                this.positions[ client.id ] = new Position({ 
-                    position: { x: -4, y: 0, z: -4 }, 
-                    rotation: { x: 0, y: 42, z: 0 }
-                });
-            }
+            this.players[ client.id ] = (playersNow.role === 'X') ? new Player('O') : new Player('X');
+            this.positions[ client.id ] = new Position({
+                position: { x: 30, y: 2, z: 10 }, 
+                rotation: { x: 0, y: -135, z: 0 }
+            });
         }
         this.state[ this.roomId ].clientNum ++;
         this.resetPlayer();
@@ -62,8 +56,16 @@ export class BoDState {
 
     movePlayer (client, transform) {
         console.log(this.positions[ client.id ].cart);
-        this.positions[ client.id ].cart.position = transform.cart.position;
-        this.positions[ client.id ].cart.rotation = transform.cart.rotation;
+        this.positions[ client.id ].head.position = transform.head.position;
+        this.positions[ client.id ].head.rotation = transform.head.rotation;
+        this.positions[ client.id ].rightHand.position = transform.rightHand.position;
+        this.positions[ client.id ].rightHand.rotation = transform.rightHand.rotation;
+        this.positions[ client.id ].leftHand.position = transform.leftHand.position;
+        this.positions[ client.id ].leftHand.rotation = transform.leftHand.rotation;
+        if (this.state[ this.roomId ].state == 2) {
+            this.positions[ client.id ].cart.position = transform.cart.position;
+            this.positions[ client.id ].cart.rotation = transform.cart.rotation;
+        }
     }
 
     resetPlayer () {
@@ -74,6 +76,17 @@ export class BoDState {
         players.state = 0;
         players.score = 0;
         players.itemList = [];
+    }
+
+    mapInit () {
+        for (let i = 0; i < 5; i++) {
+            this.wallPaper[ this.roomId ].wallPaper.push({
+                id: i+1,
+                item: 5,
+                state: 1,
+                coolDown: 10,
+            });
+        }
     }
 
     
