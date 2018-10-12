@@ -57,6 +57,7 @@ export class BoDState {
         if (this.state[ this.roomId ].state == 2) {
             this.positions[ client.id ].cart.position = transform.cart.position;
             this.positions[ client.id ].cart.rotation = transform.cart.rotation;
+            this.positions[ client.id ].cart.velocity = transform.cart.velocity;
         }
     }
 
