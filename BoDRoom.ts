@@ -4,6 +4,7 @@ import { BoDState } from "./BoDState";
 
 export class BoDRoom extends Room<BoDState> {
     maxClients = 2;
+    wallPaperLoop = true;
 
 
     // When room is initialized
@@ -32,27 +33,7 @@ export class BoDRoom extends Room<BoDState> {
             this.broadcast({
                 type: 'ready'
             });
-            this.state.gameStateChange(1);
-            let startCountdown = setInterval(() => {
-                this.state.state[ this.roomId ].ready_countdown -= 1;
-                if (this.state.state[ this.roomId ].ready_countdown <= 0) {
-                    clearInterval(startCountdown);
-                    this.broadcast({
-                        type: "start"
-                    });
-                    this.state.gameStateChange(2);
-                    let myTimer = setInterval(() => {
-                        this.state.state[ this.roomId ].countdown -= .001;
-                        if (this.state.state[ this.roomId ].countdown <= 0) {
-                            clearInterval(myTimer);
-                            this.broadcast({ 
-                                type: "over"
-                            });
-                            this.state.gameStateChange(3);
-                        }
-                    }, 1);
-                }
-            }, 1000);
+            this.gameLaunch();
         }
     }
 
@@ -64,7 +45,10 @@ export class BoDRoom extends Room<BoDState> {
         let postion = this.state.positions[ client.id ];
         if (data.type == 'move') {
             this.state.movePlayer(client, data.transform);
-            console.log(data.transform);
+            // console.log(data.transform);
+        }
+        if (data.type == 'adHit') {
+            this.state.adCoolDown(client, data.wallpaper_id);
         }
     }
 
@@ -77,5 +61,49 @@ export class BoDRoom extends Room<BoDState> {
     // Cleanup callback, called after there are no more clients in the room. (see `autoDispose`)
     onDispose () {
         console.log("Dispose BasicRoom");
+    }
+
+    gameLaunch () {
+        this.state.gameStateChange(1);
+        let startCountdown = setInterval(() => {
+            this.state.state[ this.roomId ].ready_countdown -= 1;
+            if (this.state.state[ this.roomId ].ready_countdown <= 0) {
+                clearInterval(startCountdown);
+                this.broadcast({
+                    type: "start"
+                });
+                this.state.gameStateChange(2);
+                for (let i = 0; i < this.state.wallPapers[ this.roomId ].wallPaper.length; i++){
+                    this.wallPaperHandler(i);
+                }
+                let matchTimer = setInterval(() => {
+                    this.state.state[ this.roomId ].countdown -= .001;
+                    if (this.state.state[ this.roomId ].countdown <= 0) {
+                        this.wallPaperLoop = false;
+                        clearInterval(matchTimer);
+                        console.log('Time\'s up');
+                        
+                        this.broadcast({ 
+                            type: "over"
+                        });
+                        this.state.gameStateChange(3);
+                    }
+                }, 1);
+            }
+        }, 1000);
+    }
+
+    wallPaperHandler (Target) {
+        if(this.wallPaperLoop) {
+            let changeTarget = Target;
+            let changeTime: number = Math.floor(Math.random() * 6) + 5;
+            if (this.state.wallPapers[ this.roomId ].wallPaper[changeTarget].state == 1 ) {
+                let randomItem = Math.floor(Math.random() * 7) + 1;
+                this.state.wallPapers[ this.roomId ].wallPaper[changeTarget].item = randomItem;            
+            }
+            setTimeout(() => {
+                this.wallPaperHandler(Target);
+            }, changeTime * 1000);
+        }
     }
 }

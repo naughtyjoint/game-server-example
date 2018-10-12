@@ -8,13 +8,13 @@ export class BoDState {
 
     constructor(public roomId: string){
         this.state[ this.roomId ] = new State();
-        this.wallPaper[ this.roomId ] = new WallPaper();
+        this.wallPapers[ this.roomId ] = new WallPaper();
     };
 
     state: EntityMap<State> = {};
     players: EntityMap<Player> = {};
     positions: EntityMap<Position> = {};
-    wallPaper: EntityMap<WallPaper> = {};
+    wallPapers: EntityMap<WallPaper> = {};
     
     
     gameStateChange (state: number) {
@@ -71,15 +71,28 @@ export class BoDState {
     }
 
     mapInit () {
-        for (let i = 0; i < 5; i++) {
-            this.wallPaper[ this.roomId ].wallPaper.push({
+        for (let i = 0; i < 10; i++) {
+            this.wallPapers[ this.roomId ].wallPaper.push({
                 id: i+1,
-                item: 5,
+                item: Math.floor(Math.random() * 7) + 1,
                 state: 1,
-                coolDown: 10,
+                coolDown: 0
             });
         }
     }
 
-    
+    adCoolDown (client, wallPaperId) {
+        let coolDownTime = Math.round(Math.random() * 6) + 10;
+        this.wallPapers[ this.roomId ].wallPaper[wallPaperId].state = 0;
+        this.wallPapers[ this.roomId ].wallPaper[wallPaperId].coolDown = coolDownTime;
+        console.log(`${client.id} hit wall number ${wallPaperId}, coolDown ${coolDownTime} secs !`);
+        var cdTimer = setInterval(() => {
+            this.wallPapers[ this.roomId ].wallPaper[wallPaperId].coolDown -= 1;
+            if (this.wallPapers[ this.roomId ].wallPaper[wallPaperId].coolDown <= 0) {
+                this.wallPapers[ this.roomId ].wallPaper[wallPaperId].coolDown == 0;
+                clearInterval(cdTimer);
+                this.wallPapers[ this.roomId ].wallPaper[wallPaperId].state = 1;
+            }
+        }, 1000)
+    }
 }
