@@ -1,10 +1,8 @@
-import { EntityMap, Room } from "colyseus";
+import { EntityMap } from "colyseus";
 import { Player } from "./src/models/Player";
 import { State } from "./src/models/State";
 import { Position } from "./src/models/Position";
 import { WallPaper } from "./src/models/WallPaper";
-import { REMOTE_ROOM_LARGE_TIMEOUT } from "colyseus/lib/MatchMaker";
-import { send } from "colyseus/lib/Protocol";
 
 export class BoDState {
 
