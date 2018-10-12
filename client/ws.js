@@ -12,7 +12,7 @@ room = client.join("two_player_battle");
 
 
 room.onJoin.add(function () {
-    // console.log(client.sessionId + ' joined!');
+    console.log(client.sessionId + ' joined!');
 });
 
 // // listen to patches coming from the server
@@ -85,6 +85,44 @@ room.listen("positions/:id/leftHand/rotation/:prop", (change) => {
     console.log(change);
 });
 
+room.listen("wallPapers/:id/wallPaper/:id", (change) => {
+    console.log(change);
+    if (change.operation == "add") {
+        var id = change.value.id - 1;
+        var table = document.getElementById("wallpapertable");
+        var row = table.insertRow(-1);
+        var idCell = row.insertCell(0);
+        var itemCell = row.insertCell(1);
+        var stateCell = row.insertCell(2);
+        var coolDownCell = row.insertCell(3);
+        idCell.innerHTML = id;
+        idCell.id = `id${id}`;
+        itemCell.innerHTML = change.value.item;
+        itemCell.id = `item${id}`;
+        stateCell.innerHTML = change.value.state;
+        stateCell.id = `state${id}`;
+        coolDownCell.innerHTML = change.value.coolDown;
+        coolDownCell.id = `cd${id}`;
+    } 
+});
+
+room.listen("wallPapers/:id/wallPaper/:id/:attribute", (change) => {
+    // console.log(change);
+    if (change.operation == "replace" && change.path.attribute == "item") {
+        document.getElementById(`item${change.path.id}`).innerHTML = change.value;
+    }
+    if (change.path.attribute == "state") {
+        if (change.value === 0) {
+            document.getElementById(`state${change.path.id}`).innerHTML = 'XX';
+        } else {
+            document.getElementById(`state${change.path.id}`).innerHTML = change.value;
+        }
+    }
+    if (change.path.attribute == "coolDown") {
+        document.getElementById(`cd${change.path.id}`).innerHTML = change.value;
+    }
+});
+
 
 room.onError.add(function(err) {
     console.log("oops, error ocurred:");
@@ -150,4 +188,12 @@ function moving() {
 
 function stop() {
     return null;
+}
+
+function adHit() {
+    room.send({
+        client_id: client.id,
+        type: 'adHit',
+        wallpaper_id: Math.round(Math.random() * 6)
+    });
 }

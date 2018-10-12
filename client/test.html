@@ -3,7 +3,11 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <title>Test</title>
-    
+        <style>
+            table, th, td {
+                border: 1px solid black;
+            }
+        </style>
         <!-- colyseus.js client (npm run bundle-colyseus-client) -->
         <script src="colyseus.js"></script>
         <script src="ws.js"></script>
@@ -14,6 +18,19 @@
         <div id="state">Waiting</div>
         <button onclick="moving()">move test</button>
         <button onclick="stop()">stop moving</button>
+        <button onclick="adHit()">hit ad</button>
         <div id="timer" style="text-align: center;font-size: 100px;margin-top: 100px;">timer</div>
+        <div id="wallpaper" style="line-height: 30px;">
+            <table id="wallpapertable" style="width: 140px">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>item</th>
+                        <th>state</th>
+                        <th>coolDown</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
     </body>
 </html>
