@@ -1,8 +1,10 @@
-import { EntityMap } from "colyseus";
+import { EntityMap, Room } from "colyseus";
 import { Player } from "./src/models/Player";
 import { State } from "./src/models/State";
 import { Position } from "./src/models/Position";
 import { WallPaper } from "./src/models/WallPaper";
+import { REMOTE_ROOM_LARGE_TIMEOUT } from "colyseus/lib/MatchMaker";
+import { send } from "colyseus/lib/Protocol";
 
 export class BoDState {
 
@@ -23,24 +25,16 @@ export class BoDState {
 
     addPlayer (client) {
         if (this.state[ this.roomId ].clientNum == 0) {
-            this.players[ client.id ] = new Player('O');
-            this.positions[ client.id ] = new Position(
-                {
-                    position: { x: -53, y: 2, z: -30 }, 
-                    rotation: { x: 0, y: 45, z: 0 }
-                } 
-            );
+            this.players[ client.id ] = new Player('blue');
+            this.positions[ client.id ] = new Position();            
             this.mapInit();
         } else {
             let playersNow: Player;
             for (let x in this.players) {
                 playersNow = this.players[x];
             }
-            this.players[ client.id ] = (playersNow.role === 'X') ? new Player('O') : new Player('X');
-            this.positions[ client.id ] = new Position({
-                position: { x: 30, y: 2, z: 10 }, 
-                rotation: { x: 0, y: -135, z: 0 }
-            });
+            this.players[ client.id ] = (playersNow.role === 'red') ? new Player('blue') : new Player('red');
+            this.positions[ client.id ] = new Position();
         }
         this.state[ this.roomId ].clientNum ++;
         this.resetPlayer();
