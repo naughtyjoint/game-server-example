@@ -47,9 +47,21 @@ export class BoDRoom extends Room<BoDState> {
             this.state.movePlayer(client, data.transform);
             // console.log(data.transform);
         }
+        
         if (data.type == 'adHit') {
             this.state.adCoolDown(client, data.wallpaper_id);
         }
+
+        if (data.type == 'trigger') {
+            //console.log("triggered");
+            this.broadcast({
+                type: 'trigger',
+                client_id: client.id,
+                msg: data.msg,
+            });
+        }
+
+
     }
 
     // When a client leaves the room

@@ -1,3 +1,5 @@
+import { PerformanceObserverCallback } from "perf_hooks";
+
 export class Player {
   constructor(
     public role: string, 

@@ -47,7 +47,7 @@ export class BoDState {
     }
 
     movePlayer (client, transform) {
-        console.log(this.positions[ client.id ].cart);
+        //console.log(this.positions[ client.id ].cart);
         this.positions[ client.id ].head.position = transform.head.position;
         this.positions[ client.id ].head.rotation = transform.head.rotation;
         this.positions[ client.id ].rightHand.position = transform.rightHand.position;
