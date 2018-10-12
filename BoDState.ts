@@ -25,7 +25,7 @@ export class BoDState {
 
     addPlayer (client) {
         if (this.state[ this.roomId ].clientNum == 0) {
-            this.players[ client.id ] = new Player('blue');
+            this.players[ client.id ] = new Player('A');
             this.positions[ client.id ] = new Position();            
             this.mapInit();
         } else {
@@ -33,7 +33,7 @@ export class BoDState {
             for (let x in this.players) {
                 playersNow = this.players[x];
             }
-            this.players[ client.id ] = (playersNow.role === 'red') ? new Player('blue') : new Player('red');
+            this.players[ client.id ] = (playersNow.role === 'B') ? new Player('A') : new Player('B');
             this.positions[ client.id ] = new Position();
         }
         this.state[ this.roomId ].clientNum ++;
