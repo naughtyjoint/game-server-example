@@ -23,24 +23,16 @@ export class BoDState {
 
     addPlayer (client) {
         if (this.state[ this.roomId ].clientNum == 0) {
-            this.players[ client.id ] = new Player('O');
-            this.positions[ client.id ] = new Position(
-                {
-                    position: { x: -53, y: 2, z: -30 }, 
-                    rotation: { x: 0, y: 45, z: 0 }
-                } 
-            );
+            this.players[ client.id ] = new Player('A');
+            this.positions[ client.id ] = new Position();            
             this.mapInit();
         } else {
             let playersNow: Player;
             for (let x in this.players) {
                 playersNow = this.players[x];
             }
-            this.players[ client.id ] = (playersNow.role === 'X') ? new Player('O') : new Player('X');
-            this.positions[ client.id ] = new Position({
-                position: { x: 30, y: 2, z: 10 }, 
-                rotation: { x: 0, y: -135, z: 0 }
-            });
+            this.players[ client.id ] = (playersNow.role === 'B') ? new Player('A') : new Player('B');
+            this.positions[ client.id ] = new Position();
         }
         this.state[ this.roomId ].clientNum ++;
         this.resetPlayer();
@@ -55,7 +47,7 @@ export class BoDState {
     }
 
     movePlayer (client, transform) {
-        console.log(this.positions[ client.id ].cart);
+        //console.log(this.positions[ client.id ].cart);
         this.positions[ client.id ].head.position = transform.head.position;
         this.positions[ client.id ].head.rotation = transform.head.rotation;
         this.positions[ client.id ].rightHand.position = transform.rightHand.position;
@@ -65,6 +57,7 @@ export class BoDState {
         if (this.state[ this.roomId ].state == 2) {
             this.positions[ client.id ].cart.position = transform.cart.position;
             this.positions[ client.id ].cart.rotation = transform.cart.rotation;
+            this.positions[ client.id ].cart.velocity = transform.cart.velocity;
         }
     }
 
