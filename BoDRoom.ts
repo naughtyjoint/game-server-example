@@ -89,7 +89,7 @@ export class BoDRoom extends Room<BoDState> {
                     this.wallPaperHandler(i);
                 }
                 let matchTimer = setInterval(() => {
-                    this.state.state[ this.roomId ].countdown -= .001;
+                    this.state.state[ this.roomId ].countdown -= 1;
                     if (this.state.state[ this.roomId ].countdown <= 0) {
                         this.wallPaperLoop = false;
                         clearInterval(matchTimer);
@@ -100,7 +100,7 @@ export class BoDRoom extends Room<BoDState> {
                         });
                         this.state.gameStateChange(3);
                     }
-                }, 1);
+                }, 1000);
             }
         }, 1000);
     }
