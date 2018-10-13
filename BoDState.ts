@@ -90,17 +90,41 @@ export class BoDState {
     }
 
     adCoolDown (client, wallPaperId) {
-        let coolDownTime = Math.round(Math.random() * 6) + 10;
-        this.wallPapers[ this.roomId ].wallPaper[wallPaperId].state = 0;
-        this.wallPapers[ this.roomId ].wallPaper[wallPaperId].coolDown = coolDownTime;
-        console.log(`${client.id} hit wall number ${wallPaperId}, coolDown ${coolDownTime} secs !`);
-        var cdTimer = setInterval(() => {
-            this.wallPapers[ this.roomId ].wallPaper[wallPaperId].coolDown -= 1;
-            if (this.wallPapers[ this.roomId ].wallPaper[wallPaperId].coolDown <= 0) {
-                this.wallPapers[ this.roomId ].wallPaper[wallPaperId].coolDown == 0;
-                clearInterval(cdTimer);
-                this.wallPapers[ this.roomId ].wallPaper[wallPaperId].state = 1;
-            }
-        }, 1000)
+        let wallPaper = this.wallPapers[ this.roomId ].wallPaper[wallPaperId];
+        if (wallPaper.state != 0) {
+            let coolDownTime = Math.round(Math.random() * 6) + 10;
+            wallPaper.state = 0;
+            wallPaper.coolDown = coolDownTime;
+            console.log(`${client.id} hit wall number ${wallPaperId}, coolDown ${coolDownTime} secs !`);
+            var cdTimer = setInterval(() => {
+                wallPaper.coolDown -= 1;
+                if (wallPaper.coolDown <= 0) {
+                    wallPaper.coolDown == 0;
+                    wallPaper.item = this.getRandomItem();
+                    clearInterval(cdTimer);
+                    wallPaper.state = 1;
+                }
+            }, 1000)
+        }
+    }
+
+    getRandomItem () {
+        let item = Math.random() * 110;
+        switch (true) {
+            case item < 29.8 :
+                return 1;
+            case item >= 29.8 && item < 54.63 :
+                return 2;
+            case item >= 54.63 && item < 73.255 :
+                return 3;
+            case item >= 73.255 && item < 88.155 :
+                return 4;
+            case item >= 88.155 && item < 98.055 :
+                return 5;
+            case item >= 98.055 && item < 107.985 :
+                return 6;
+            case item >= 107.985 :
+                return 7;
+        }
     }
 }

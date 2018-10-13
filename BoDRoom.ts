@@ -98,8 +98,7 @@ export class BoDRoom extends Room<BoDState> {
             let changeTarget = Target;
             let changeTime: number = Math.floor(Math.random() * 6) + 5;
             if (this.state.wallPapers[ this.roomId ].wallPaper[changeTarget].state == 1 ) {
-                let randomItem = Math.floor(Math.random() * 7) + 1;
-                this.state.wallPapers[ this.roomId ].wallPaper[changeTarget].item = randomItem;            
+                this.state.wallPapers[ this.roomId ].wallPaper[changeTarget].item = this.state.getRandomItem();            
             }
             setTimeout(() => {
                 this.wallPaperHandler(Target);
