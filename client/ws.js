@@ -12,7 +12,8 @@ room = client.join("two_player_battle");
 
 
 room.onJoin.add(function () {
-    console.log(client.sessionId + ' joined!');
+    console.log('Welcome');
+    document.getElementById('role').innerHTML = client.id;
 });
 
 // // listen to patches coming from the server
@@ -31,6 +32,12 @@ room.listen("players/:id", (change) => {
     }
 });
 
+room.listen("players/:id/:attribute", (change) => {  
+    if (change.operation === "replace") {
+        console.log(change);
+    }
+});
+
 room.listen("state/:id/:attribute", (change) => {
     if (change.operation === "add") {
         console.log(change);
@@ -38,10 +45,10 @@ room.listen("state/:id/:attribute", (change) => {
         console.log(change);
     } else if (change.operation === "replace") {
         if (change.path.attribute === "ready_countdown") {
-            document.getElementById('timer').innerHTML = `${change.value.toFixed(2)}`;
+            document.getElementById('timer').innerHTML = `${change.value}`;
         }
         if (change.path.attribute === "countdown") {
-            document.getElementById('timer').innerHTML = `${change.value.toFixed(2)}`;
+            document.getElementById('timer').innerHTML = `${change.value}`;
         }
         if (change.path.attribute === "state") {
             switch (change.value) {
@@ -194,6 +201,22 @@ function adHit() {
     room.send({
         client_id: client.id,
         type: 'adHit',
-        wallpaper_id: Math.round(Math.random() * 6)
+        wallpaper_id: Math.round(Math.random() * 100)
     });
+}
+
+function playerHit(target) {
+    room.send({
+        client_id: client.id,
+        type: 'playerHit',
+        target: target
+    });
+}
+
+function scanned(killer) {
+    room.send({
+        client_id: client.id,
+        type: 'scanned',
+        killer: killer
+    })
 }

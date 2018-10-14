@@ -21,12 +21,11 @@ export class BoDRoom extends Room<BoDState> {
     // When client successfully join the room
     onJoin (client: Client, options: any) {
         console.log(`client (session id : ${client.sessionId} & id : ${client.id}) SUCCESS JOINING !`);
-        let role = this.state.addPlayer(client);
-        
+        let playerInfo = this.state.addPlayer(client);
         this.broadcast({
             type: 'join',
             client_id: client.id,
-            msg: `${role} joined.`,
+            msg: `${playerInfo.role} joined.`,
         });
 
         if (this.clients.length == 2) {
@@ -60,7 +59,27 @@ export class BoDRoom extends Room<BoDState> {
                 msg: data.msg,
             });
         }
+        if (data.type == 'playerHit') {
+            let result = this.state.playerHit(client, data.target);
+            if (result) {
+                this.broadcast({
+                    type: 'kill',
+                    killer: data.killer,
+                    victim: client.id
+                });
+            }
+        }
 
+        if (data.type == 'scanned') {
+            let result = this.state.scanned(client, data.killer);
+            if (result) {
+                this.broadcast({
+                    type: 'kill',
+                    killer: data.killer,
+                    victim: client.id
+                });
+            }
+        }
 
     }
 
@@ -98,6 +117,10 @@ export class BoDRoom extends Room<BoDState> {
                         this.broadcast({ 
                             type: "over"
                         });
+                        this.broadcast({
+                            type: "result",
+                            players: this.state.players
+                        })
                         this.state.gameStateChange(3);
                     }
                 }, 1000);

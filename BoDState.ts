@@ -3,6 +3,8 @@ import { Player } from "./src/models/Player";
 import { State } from "./src/models/State";
 import { Position } from "./src/models/Position";
 import { WallPaper } from "./src/models/WallPaper";
+import { KillList } from "./src/models/KillList";
+import { DeadList } from "./src/models/DeadList";
 
 export class BoDState {
 
@@ -24,7 +26,9 @@ export class BoDState {
     addPlayer (client) {
         if (this.state[ this.roomId ].clientNum == 0) {
             this.players[ client.id ] = new Player('A');
-            this.positions[ client.id ] = new Position();            
+            this.positions[ client.id ] = new Position(); 
+            this.state[ this.roomId ].killList[ client.id ] = new KillList([]);    
+            this.state[ this.roomId ].deadList[ client.id ] = new DeadList([]);           
             this.mapInit();
         } else {
             let playersNow: Player;
@@ -33,9 +37,11 @@ export class BoDState {
             }
             this.players[ client.id ] = (playersNow.role === 'B') ? new Player('A') : new Player('B');
             this.positions[ client.id ] = new Position();
+            this.state[ this.roomId ].killList[ client.id ] = new KillList([]);
+            this.state[ this.roomId ].deadList[ client.id ] = new DeadList([]);
         }
         this.state[ this.roomId ].clientNum ++;
-        this.resetPlayer();
+        // this.resetPlayer();
         let clientInfo = this.players[ client.id ];
         return {
             role: clientInfo.role
@@ -66,13 +72,14 @@ export class BoDState {
             for (let x in this.players) {
                 players = this.players[x];
             }
-        players.state = 0;
+        players.status = 0;
         players.score = 0;
         players.itemList = [];
+        players.kill = 0;
     }
 
     mapInit () {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 100; i++) {
             this.wallPapers[ this.roomId ].wallPaper.push({
                 id: i+1,
                 item: Math.floor(Math.random() * 7) + 1,
@@ -82,9 +89,16 @@ export class BoDState {
         }
     }
 
+    adScore(clientId: string, wallPaper) {
+        let pointMap = [0, 50, 60, 80, 100, 150, 150, 900];
+        let point = pointMap[wallPaper.item];
+        this.players[ clientId ].score += point;
+    }
+
     adCoolDown (client, wallPaperId) {
         let wallPaper = this.wallPapers[ this.roomId ].wallPaper[wallPaperId];
-        if (wallPaper.state != 0) {
+        if (wallPaper.state != 0 && this.state[ this.roomId ].state == 2) {
+            this.adScore(client.id, wallPaper);
             let coolDownTime = Math.round(Math.random() * 6) + 10;
             wallPaper.state = 0;
             wallPaper.coolDown = coolDownTime;
@@ -99,6 +113,14 @@ export class BoDState {
                 }
             }, 1000)
         }
+    }
+
+    playerCoolDown(clientId: string) {
+        let player = this.players[ clientId ];
+        player.status = 0;
+        setTimeout(() => {
+            player.status = 1;
+        }, 10000);
     }
 
     getRandomItem () {
@@ -118,6 +140,62 @@ export class BoDState {
                 return 6;
             case item >= 107.985 :
                 return 7;
+        }
+    }
+
+    playerHit (client, target) {
+        if (!this.players[ target ]) {
+            return false;
+        }
+        if (this.players[ client.id ].status == 1 && this.players[ target ].status == 1){
+            let result = false;
+            this.state[ this.roomId ].deadList[ target ].list.forEach((value, index) => {
+                if (value.killerId == client.id) {
+                    console.log(value);
+                    if (Date.now() <= value.timestamp + 10000) {
+                        this.players[ client.id ].score += 1000;
+                        this.players[ client.id ].kill += 1;
+                        this.state[ this.roomId ].deadList[ target ].list.splice(index, 1);
+                        this.playerCoolDown(target);
+                        result = true;
+                    }
+                }
+            });
+
+            this.state[ this.roomId ].killList[ client.id ].list.push({
+                victimId: target,
+                timestamp: Date.now()
+            });
+
+            return result;
+        }
+    }
+
+    scanned (client, killer) {
+        if (!this.players[ killer ]) {
+            return false;
+        }
+        if (this.players[ client.id ].status == 1 && this.players[ killer ].status == 1){
+            let result = false;
+            this.state[ this.roomId ].killList[ killer ].list.forEach((value, index) => {
+                if (value.victimId == client.id) {
+                    console.log(value);
+                    if (Date.now() <= value.timestamp + 10000) {
+                        this.players[ killer ].score += 1000;
+                        this.players[ killer ].kill += 1;
+                        this.state[ this.roomId ].killList[ killer ].list.splice(index, 1);
+                        this.playerCoolDown(client.id);
+                        result = true;
+                    }
+                }
+            });
+
+            this.state[ this.roomId ].deadList[ client.id ].list.push({
+                killerId: killer,
+                timestamp: Date.now()
+            });
+
+            return result;
         }
     }
 }
