@@ -35,6 +35,9 @@ room.listen("players/:id", (change) => {
 room.listen("players/:id/:attribute", (change) => {  
     if (change.operation === "replace") {
         console.log(change);
+        if (change.path.attribute == "score" && change.path.id == client.id) {
+            document.getElementById('score').innerHTML = `Your score : ${change.value}`;
+        }
     }
 });
 
@@ -66,6 +69,21 @@ room.listen("state/:id/:attribute", (change) => {
         
     }
 });
+room.listen("positions/:id/rightHand/:attribute", (change) => {
+    if (change.path.attribute == 'item' && change.path.id == client.id) {
+        document.getElementById("rightHandItem").innerHTML = `right hand item : ${change.value}`;
+    } else if (change.path.attribute == 'ammo'  && change.path.id == client.id) {
+        document.getElementById("rightHandAmmo").innerHTML = `right hand ammo : ${change.value}`;
+    }
+});
+
+room.listen("positions/:id/leftHand/:attribute", (change) => {
+    if (change.path.attribute == 'item'  && change.path.id == client.id) {
+        document.getElementById("leftHandItem").innerHTML = `left hand item : ${change.value}`;
+    } else if (change.path.attribute == 'ammo'  && change.path.id == client.id) {
+        document.getElementById("leftHandAmmo").innerHTML = `left hand ammo : ${change.value}`;
+    }
+});
 
 room.listen("positions/:id/cart/position/:prop", (change) => {
     console.log(change.path.id);
@@ -93,7 +111,7 @@ room.listen("positions/:id/leftHand/rotation/:prop", (change) => {
 });
 
 room.listen("wallPapers/:id/wallPaper/:id", (change) => {
-    console.log(change);
+    // console.log(change);
     if (change.operation == "add") {
         var id = change.value.id - 1;
         var table = document.getElementById("wallpapertable");
@@ -198,10 +216,13 @@ function stop() {
 }
 
 function adHit() {
+    var dice = Math.round(Math.random() * 1);
+    var hand = (Boolean(dice)) ? 'right' : 'left';
     room.send({
         client_id: client.id,
         type: 'adHit',
-        wallpaper_id: Math.round(Math.random() * 100)
+        wallpaper_id: Math.floor(Math.random() * 10),
+        hand: hand
     });
 }
 
@@ -219,4 +240,20 @@ function scanned(killer) {
         type: 'scanned',
         killer: killer
     })
+}
+
+function fireRight() {
+    room.send({
+        client_id: client.id,
+        type: 'fire',
+        hand: 'right'
+    });
+}
+
+function fireLeft() {
+    room.send({
+        client_id: client.id,
+        type: 'fire',
+        hand: 'left'
+    });
 }

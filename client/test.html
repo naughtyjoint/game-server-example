@@ -15,12 +15,21 @@
 
     <body>
         <h1>BuyOrDie charactor move test</h1>
-        <div id="role"></div>
-        <div id="state">Waiting</div>
-        <button onclick="moving()">move test</button>
-        <button onclick="stop()">stop moving</button>
-        <button onclick="adHit()">hit ad</button>
-        <div id="timer" style="text-align: center;font-size: 100px;margin-top: 100px;">timer</div>
+        <div id="role" style="margin: 30px; float: left;"></div>
+        <div id="status" style="margin: 30px; float: left;">player state : 1</div>
+        <div id="rightHandItem" style="margin: 30px; float: left;">right hand item : 0</div>
+        <div id="rightHandAmmo" style="margin: 30px; float: left;">right hand Ammo : 0</div>
+        <div id="leftHandItem" style="margin: 30px; float: left;">left hand item : 0</div>
+        <div id="leftHandAmmo" style="margin: 30px; float: left;">right hand Ammo : 0</div>
+        <div id="state" style="clear: both;">Waiting</div>
+        <div id="score" style="font-size: 30px;">Your score : 0</div>
+        <button onclick="moving()" style="float: left;">move test</button>
+        <button onclick="stop()" style="float: left;">stop moving</button>
+        <button onclick="adHit()" style="float: left;">hit ad</button>
+        <button onclick="fireRight()" style="float: left;">fire right hand</button>
+        <button onclick="fireLeft()" style="float: left;">fire left hand</button>
+        <div style="clear: both;"></div>
+        <div id="timer" style="font-size: 100px; margin: 100px; float: left;">timer</div>
         <div id="wallpaper" style="line-height: 30px;">
             <table id="wallpapertable" style="width: 140px">
                 <thead>

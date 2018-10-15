@@ -40,11 +40,13 @@ export class Position {
         },
         public rightHand: { 
             item: number,
+            ammo: number,
             position: { x: number, y: number, z: number }, 
             rotation: { x: number, y: number, z: number }
         } = 
         {
-            item: null,
+            item: 0,
+            ammo: null,
             position: {
                 x: 0, 
                 y: 0, 
@@ -58,11 +60,13 @@ export class Position {
         },
         public leftHand: { 
             item: number,
+            ammo: number,
             position: { x: number, y: number, z: number }, 
             rotation: { x: number, y: number, z: number }
         } = 
         {
-            item: null,
+            item: 0,
+            ammo: null,
             position: {
                 x: 0, 
                 y: 0, 

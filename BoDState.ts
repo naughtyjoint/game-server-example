@@ -53,14 +53,13 @@ export class BoDState {
     }
 
     movePlayer (client, transform) {
-        //console.log(this.positions[ client.id ].cart);
         this.positions[ client.id ].head.position = transform.head.position;
         this.positions[ client.id ].head.rotation = transform.head.rotation;
         this.positions[ client.id ].rightHand.position = transform.rightHand.position;
         this.positions[ client.id ].rightHand.rotation = transform.rightHand.rotation;
         this.positions[ client.id ].leftHand.position = transform.leftHand.position;
         this.positions[ client.id ].leftHand.rotation = transform.leftHand.rotation;
-        if (this.state[ this.roomId ].state == 2) {
+        if (this.state[ this.roomId ].state == 2 && this.players[ client.id ].status != 0) {
             this.positions[ client.id ].cart.position = transform.cart.position;
             this.positions[ client.id ].cart.rotation = transform.cart.rotation;
             this.positions[ client.id ].cart.velocity = transform.cart.velocity;
@@ -79,7 +78,7 @@ export class BoDState {
     }
 
     mapInit () {
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 10; i++) {
             this.wallPapers[ this.roomId ].wallPaper.push({
                 id: i+1,
                 item: Math.floor(Math.random() * 7) + 1,
@@ -89,16 +88,49 @@ export class BoDState {
         }
     }
 
-    adScore(clientId: string, wallPaper) {
+    itemSwitch (clientId: string, hand, wallPaper) {
+        let itemId = wallPaper.item;
+        if (hand == 'left') {
+            this.positions[ clientId ].leftHand.item = itemId;
+            if (itemId == 3) {
+                setTimeout(() => {
+                    this.positions[ clientId ].leftHand.item = 0;
+                }, 5000);
+            } else if (itemId == 6 || itemId == 7) {
+                setTimeout(() => {
+                    this.positions[ clientId ].leftHand.item = 0;
+                }, 10000);
+            } else {
+                this.loadAmmo(clientId, itemId, hand);
+            }
+        } else if (hand == 'right') {
+            this.positions[ clientId ].rightHand.item = itemId;
+            if (itemId == 3) {
+                setTimeout(() => {
+                    this.positions[ clientId ].rightHand.item = 0;
+                }, 5000);
+            } else if (itemId == 6 || itemId == 7) {
+                setTimeout(() => {
+                    this.positions[ clientId ].rightHand.item = 0;
+                }, 10000);
+            } else {
+                this.loadAmmo(clientId, itemId, hand);
+            }
+        }
+    }
+
+    adScore (clientId: string, wallPaper) {
         let pointMap = [0, 50, 60, 80, 100, 150, 150, 900];
         let point = pointMap[wallPaper.item];
+        this.players[ clientId ].itemList.push(wallPaper.item);
         this.players[ clientId ].score += point;
     }
 
-    adCoolDown (client, wallPaperId) {
+    adCoolDown (client, wallPaperId, hand) {
         let wallPaper = this.wallPapers[ this.roomId ].wallPaper[wallPaperId];
         if (wallPaper.state != 0 && this.state[ this.roomId ].state == 2) {
             this.adScore(client.id, wallPaper);
+            this.itemSwitch(client.id, hand, wallPaper);
             let coolDownTime = Math.round(Math.random() * 6) + 10;
             wallPaper.state = 0;
             wallPaper.coolDown = coolDownTime;
@@ -115,9 +147,11 @@ export class BoDState {
         }
     }
 
-    playerCoolDown(clientId: string) {
+    playerCoolDown (clientId: string) {
         let player = this.players[ clientId ];
         player.status = 0;
+        this.positions[ clientId ].leftHand.item = 0;
+        this.positions[ clientId ].rightHand.item = 0;
         setTimeout(() => {
             player.status = 1;
         }, 10000);
@@ -198,4 +232,53 @@ export class BoDState {
             return result;
         }
     }
+
+    fire (clientId, hand) {
+        if (hand == 'right') {
+            let ItemWithAmmo = [1, 2, 4, 5];
+            let nowItem = this.positions[ clientId ].rightHand.item;
+            let nowAmmoAmount = this.positions[ clientId ].rightHand.ammo;
+            if (ItemWithAmmo.indexOf(nowItem) != -1 && nowAmmoAmount > 0) {
+                this.positions[ clientId ].rightHand.ammo -= 1;
+                if (this.positions[ clientId ].rightHand.ammo <= 0) {
+                    this.positions[ clientId ].rightHand.item = 0;
+                    this.positions[ clientId ].rightHand.ammo = null;
+                }
+            }
+        } else {
+            let ItemWithAmmo = [1, 2, 4, 5];
+            let nowItem = this.positions[ clientId ].leftHand.item;
+            let nowAmmoAmount = this.positions[ clientId ].leftHand.ammo;
+            if (ItemWithAmmo.indexOf(nowItem) != -1 && nowAmmoAmount > 0) {
+                this.positions[ clientId ].leftHand.ammo -= 1;
+                if (this.positions[ clientId ].leftHand.ammo <= 0) {
+                    this.positions[ clientId ].leftHand.item = 0;
+                    this.positions[ clientId ].leftHand.ammo = null;
+                }
+            }
+        }
+    }
+
+    loadAmmo (client, itemId, hand) {
+        let ammoAmount = 0;
+        switch (itemId) {
+            case 1:
+            case 2:
+                ammoAmount = 1;
+                break;
+            case 4:
+                ammoAmount = 5;
+                break;
+            case 5:
+                ammoAmount = 30;
+                break;
+        }
+
+        if (hand == 'right') {
+            this.positions[ client ].rightHand.ammo = ammoAmount;
+        } else if (hand == 'left') {
+            this.positions[ client ].leftHand.ammo = ammoAmount;
+        }
+    }
+
 }
