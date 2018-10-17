@@ -78,7 +78,7 @@ export class BoDState {
     }
 
     mapInit () {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < Number(process.env.WALLPAPER_NUM); i++) {
             this.wallPapers[ this.roomId ].wallPaper.push({
                 id: i+1,
                 item: Math.floor(Math.random() * 7) + 1,
@@ -87,7 +87,6 @@ export class BoDState {
             });
         }
     }
-
     itemSwitch (clientId: string, hand, wallPaper) {
         let itemId = wallPaper.item;
         if (hand == 'left') {
@@ -149,11 +148,13 @@ export class BoDState {
 
     playerCoolDown (clientId: string) {
         let player = this.players[ clientId ];
+        this.positions[ clientId ].leftHand.item = null;
+        this.positions[ clientId ].rightHand.item = null;
         player.status = 0;
-        this.positions[ clientId ].leftHand.item = 0;
-        this.positions[ clientId ].rightHand.item = 0;
         setTimeout(() => {
             player.status = 1;
+            this.positions[ clientId ].leftHand.item = 0;
+            this.positions[ clientId ].rightHand.item = 0;
         }, 10000);
     }
 
@@ -186,7 +187,7 @@ export class BoDState {
             this.state[ this.roomId ].deadList[ target ].list.forEach((value, index) => {
                 if (value.killerId == client.id) {
                     console.log(value);
-                    if (Date.now() <= value.timestamp + 10000) {
+                    if (Date.now() <= value.timestamp + 100) {
                         this.players[ client.id ].score += 1000;
                         this.players[ client.id ].kill += 1;
                         this.state[ this.roomId ].deadList[ target ].list.splice(index, 1);
@@ -214,7 +215,7 @@ export class BoDState {
             this.state[ this.roomId ].killList[ killer ].list.forEach((value, index) => {
                 if (value.victimId == client.id) {
                     console.log(value);
-                    if (Date.now() <= value.timestamp + 10000) {
+                    if (Date.now() <= value.timestamp + 100) {
                         this.players[ killer ].score += 1000;
                         this.players[ killer ].kill += 1;
                         this.state[ this.roomId ].killList[ killer ].list.splice(index, 1);
@@ -228,7 +229,7 @@ export class BoDState {
                 killerId: killer,
                 timestamp: Date.now()
             });
-
+            
             return result;
         }
     }
