@@ -38,6 +38,9 @@ room.listen("players/:id/:attribute", (change) => {
         if (change.path.attribute == "score" && change.path.id == client.id) {
             document.getElementById('score').innerHTML = `Your score : ${change.value}`;
         }
+        if (change.path.attribute == "ststus") {
+            document.getElementById('status').innerHTML = `player state : ${change.value}`;
+        }
     }
 });
 
@@ -86,28 +89,28 @@ room.listen("positions/:id/leftHand/:attribute", (change) => {
 });
 
 room.listen("positions/:id/cart/position/:prop", (change) => {
-    console.log(change.path.id);
+    //console.log(change.path.id);
 });
 room.listen("positions/:id/cart/rotation/:prop", (change) => {
-    console.log(change);
+    //console.log(change);
 });
 room.listen("positions/:id/head/position/:prop", (change) => {
-    console.log(change.path.id);
+    //console.log(change.path.id);
 });
 room.listen("positions/:id/head/rotation/:prop", (change) => {
-    console.log(change);
+    //console.log(change);
 });
 room.listen("positions/:id/rightHand/position/:prop", (change) => {
-    console.log(change.path.id);
+    //console.log(change.path.id);
 });
 room.listen("positions/:id/rightHand/rotation/:prop", (change) => {
-    console.log(change);
+    //console.log(change);
 });
 room.listen("positions/:id/leftHand/position/:prop", (change) => {
-    console.log(change.path.id);
+    //console.log(change.path.id);
 });
 room.listen("positions/:id/leftHand/rotation/:prop", (change) => {
-    console.log(change);
+    //console.log(change);
 });
 
 room.listen("wallPapers/:id/wallPaper/:id", (change) => {
@@ -256,4 +259,38 @@ function fireLeft() {
         type: 'fire',
         hand: 'left'
     });
+}
+
+function pressRight() {
+    room.send({
+        client_id: client.id,
+        type: 'trigger',
+        msg: 'RightTriggerPress'
+    });
+}
+
+function pressLeft() {
+    room.send({
+        client_id: client.id,
+        type: 'trigger',
+        msg: 'LeftTriggerPress'
+    });
+}
+
+function releaseRight() {
+    room.send({
+        client_id: client.id,
+        type: 'trigger',
+        msg: 'RightTriggerRelease'
+    });
+    console.log("RightTriggerRelease");
+}
+
+function releaseLeft() {
+    room.send({
+        client_id: client.id,
+        type: 'trigger',
+        msg: 'LeftTriggerRelease'
+    });
+    console.log("LeftTriggerRelease");
 }

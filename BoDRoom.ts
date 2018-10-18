@@ -68,8 +68,8 @@ export class BoDRoom extends Room<BoDState> {
             if (result) {
                 this.broadcast({
                     type: 'kill',
-                    killer: data.killer,
-                    victim: client.id
+                    killer: client.id,
+                    victim: data.target
                 });
             }
         }
