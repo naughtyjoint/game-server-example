@@ -127,7 +127,7 @@ export class BoDState {
 
     adCoolDown (client, wallPaperId, hand) {
         let wallPaper = this.wallPapers[ this.roomId ].wallPaper[wallPaperId];
-        if (wallPaper.state != 0 && this.state[ this.roomId ].state == 2) {
+        if (wallPaper.state != 0 && this.state[ this.roomId ].state == 2 && this.players[ client.id ].status == 1) {
             this.adScore(client.id, wallPaper);
             this.itemSwitch(client.id, hand, wallPaper);
             let coolDownTime = Math.round(Math.random() * 6) + 10;
@@ -151,11 +151,16 @@ export class BoDState {
         this.positions[ clientId ].leftHand.item = null;
         this.positions[ clientId ].rightHand.item = null;
         player.status = 0;
-        setTimeout(() => {
-            player.status = 1;
-            this.positions[ clientId ].leftHand.item = 0;
-            this.positions[ clientId ].rightHand.item = 0;
-        }, 10000);
+        let coolDown = setInterval(() => {
+            player.cdCountdown -= 1;
+            if (player.cdCountdown <= 0) {
+                clearInterval(coolDown);
+                player.cdCountdown = 10;
+                player.status = 1;
+                this.positions[ clientId ].leftHand.item = 0;
+                this.positions[ clientId ].rightHand.item = 0;
+            }
+        }, 1000);
     }
 
     getRandomItem () {

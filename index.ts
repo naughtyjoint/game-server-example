@@ -2,7 +2,7 @@ import { Server } from "colyseus";
 import { createServer } from "http";
 import * as express from "express";
 
-import {BoDRoom} from './BoDRoom';
+import { BoDRoom } from './BoDRoom';
 
 const Dotenv: any = require('dotenv');
 Dotenv.config();

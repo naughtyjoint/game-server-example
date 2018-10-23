@@ -38,53 +38,51 @@ export class BoDRoom extends Room<BoDState> {
 
     // When a client sends a message
     onMessage (client: Client, data: any) {
-        let time = this.state.state[ this.roomId ].countdown;
-        let state = this.state.state[ this.roomId ];
-        let player = this.state.players[ client.id ];
-        let postion = this.state.positions[ client.id ];
-        if (data.type == 'move') {
-            this.state.movePlayer(client, data.transform);
-            // console.log(data.transform);
-        }
+        switch (data.type) {
+            case 'move':
+                this.state.movePlayer(client, data.transform);
+                // console.log(data.transform);
+                break;
 
-        if (data.type == 'trigger') {
-            this.broadcast({
-                type: 'trigger',
-                client_id: client.id,
-                msg: data.msg,
-            });
-        }
-
-        if (data.type == 'fire') {
-            this.state.fire(client.id, data.hand);
-        }
-        
-        if (data.type == 'adHit') {
-            this.state.adCoolDown(client, data.wallpaper_id, data.hand);
-        }
-
-        if (data.type == 'playerHit') {
-            let result = this.state.playerHit(client, data.target);
-            if (result) {
+            case 'trigger':
                 this.broadcast({
-                    type: 'kill',
-                    killer: client.id,
-                    victim: data.target
+                    type: 'trigger',
+                    client_id: client.id,
+                    msg: data.msg,
                 });
-            }
-        }
+                break;
 
-        if (data.type == 'scanned') {
-            let result = this.state.scanned(client, data.killer);
-            if (result) {
-                this.broadcast({
-                    type: 'kill',
-                    killer: data.killer,
-                    victim: client.id
-                });
-            }
-        }
+            case 'fire':
+                this.state.fire(client.id, data.hand);
+                break;
 
+            case 'adHit':
+                this.state.adCoolDown(client, data.wallpaper_id, data.hand);
+                break;
+
+            case 'playerHit':
+                let result = this.state.playerHit(client, data.target);
+                if (result) {
+                    this.broadcast({
+                        type: 'kill',
+                        killer: client.id,
+                        victim: data.target
+                    });
+                }
+                break;
+
+            case 'scanned':
+                {
+                    let result = this.state.scanned(client, data.killer);
+                    if (result) {
+                        this.broadcast({
+                            type: 'kill',
+                            killer: data.killer,
+                            victim: client.id
+                        });
+                    }
+                }
+        }
     }
 
     // When a client leaves the room

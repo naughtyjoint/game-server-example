@@ -38,7 +38,7 @@ room.listen("players/:id/:attribute", (change) => {
         if (change.path.attribute == "score" && change.path.id == client.id) {
             document.getElementById('score').innerHTML = `Your score : ${change.value}`;
         }
-        if (change.path.attribute == "ststus") {
+        if (change.path.attribute == "status") {
             document.getElementById('status').innerHTML = `player state : ${change.value}`;
         }
     }
